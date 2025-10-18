@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "../../DB";
-import { NotFoundException } from "../../utils";
+import { NotFoundException, REACTION } from "../../utils";
 
 class PostService {
     private readonly postFactoryService = new PostFactoryService()
@@ -41,7 +41,13 @@ class PostService {
         if(userReactedIndex == -1){
         await this.postRepository.update(
             {_id:id},
-            {$push:{reactions:{reaction, userId}}}
+            {$push:{
+                reactions:
+                {reaction:
+                    // if (reaction == null | undefined)  {REACTION.like}  else {reaction}
+                    [null, undefined].includes(reaction) ? REACTION.like  : reaction, 
+                    userId }
+                }}
         );
         } // if req.body = undefined, null, "" , this means "remove reaction".
         else if([undefined, null, ""].includes(reaction)){
