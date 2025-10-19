@@ -3,6 +3,7 @@ import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "../../DB";
 import { NotFoundException, REACTION } from "../../utils";
+import { success } from "zod";
 
 class PostService {
     private readonly postFactoryService = new PostFactoryService()
@@ -35,7 +36,7 @@ class PostService {
         if(!postExist) throw new NotFoundException("Post not found.");
         
         let userReactedIndex = postExist.reactions.findIndex((reaction)=>{
-            return reaction.userId.toString() == userId.toString();
+            return reaction.userId.toString() == userId;
         })
 
         if(userReactedIndex == -1){
@@ -65,6 +66,27 @@ class PostService {
         
         // send response
         return res.status(204)
+
+    }
+
+    public getSpecificPost = async (req:Request, res:Response)=>{
+        // get data from req
+        const { id } = req.params;  // post id
+        const post = await this.postRepository.getOne({_id:id},
+            {},
+            {
+                populate: [
+                    {path:"userId", select:"fullName firstName lastName"}, // any virtuals must put their original fields in select
+                    {path:"reaction.userId", select:"fullName firstName lastName"}
+                ]
+            });  
+
+        if(!post) throw new NotFoundException("Post not found.");
+        return res.status(200).json({
+            message:"Done",
+            success:true,
+            data:{post}
+        })
 
     }
 }

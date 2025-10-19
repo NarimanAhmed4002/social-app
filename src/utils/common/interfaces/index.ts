@@ -1,11 +1,10 @@
-import { JwtPayload } from "jsonwebtoken";
 import { GENDER, REACTION, SYS_ROLE, USER_AGENT } from "../../../utils";
 import { Document, ObjectId } from "mongoose";
 
-// export interface IAttachment{
-//     url:string;
-//     id:string;
-// }
+export interface IAttachment{
+    url:string;
+    id:string;
+}
 
 export interface IReaction {
     userId:ObjectId;
