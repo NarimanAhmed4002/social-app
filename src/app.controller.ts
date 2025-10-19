@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, type Express } from "express";
-import { authRouter, userRouter, postRouter } from "./module";
+import { authRouter, userRouter, postRouter, commentRouter } from "./module";
 import { connectdb } from "./DB";
 import { AppError } from "./utils";
 export function bootstrap (app: Express, express:any){
@@ -13,6 +13,7 @@ export function bootstrap (app: Express, express:any){
     app.use("/user", userRouter)
     // message
     // comments
+    app.use("/comment", commentRouter)
     // posts
     app.use("/post", postRouter)
     app.use("/{*dummy}", (req, res, next) => {

@@ -12,6 +12,7 @@ export interface IReaction {
 }
 
 export interface IUser {
+    _id:ObjectId;
     firstName:string;
     lastName:string;
     fullName?:string;
@@ -29,10 +30,22 @@ export interface IUser {
 }
 
 export interface IPost {
+    _id:ObjectId;
     userId: ObjectId;
     content:string;
     reactions:IReaction[];
     // attachments?:IAttachment
+}
+
+export interface IComment {
+    _id:ObjectId;
+    userId: ObjectId;
+    postId: ObjectId;
+    parentIds: ObjectId[]; // sorted paren1 , parent2, ...
+    content:string;
+    attachment?:IAttachment;
+    reactions:IReaction[];
+    mentions:ObjectId[]; 
 }
 
 // Re-open interfaces

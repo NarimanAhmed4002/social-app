@@ -28,24 +28,24 @@ export const userSchema = new Schema <IUser> ({
     password:{
         type:String,
         required:function () {
-            if(this.userAgent == "google") return false;
+            if(this.userAgent == USER_AGENT.google) return false;
             return true;
         }
     },
     credentialsUpdatedAt:{type:Number},
     phone:{type:String},
     role:{
-        type:String,
+        type:Number,
         enum:SYS_ROLE,
         default:SYS_ROLE.user
     },
     gender:{
-        type:String,
+        type:Number,
         enum:GENDER,
         default:GENDER.female
     },
     userAgent:{
-        type:String,
+        type:Number,
         enum:USER_AGENT,
         default:USER_AGENT.local
     },
@@ -64,7 +64,7 @@ userSchema.virtual("fullName").get(function (){
 });
 // Defines the structure of the user document/table, often using Mongoose or an ORM.
 // Example: fields like name, email, password, with validation rules.
-// to JSON to appear in response in postman
+// to JSON to appear in response in postman : to appear virtuals in json response
 // to Object to appear in BE in other functions 
 
 userSchema.pre("save", async function (next) {

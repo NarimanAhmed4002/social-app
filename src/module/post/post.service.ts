@@ -36,7 +36,7 @@ class PostService {
         if(!postExist) throw new NotFoundException("Post not found.");
         
         let userReactedIndex = postExist.reactions.findIndex((reaction)=>{
-            return reaction.userId.toString() == userId;
+            return reaction.userId.toString() == userId.toString();
         })
 
         if(userReactedIndex == -1){
@@ -77,8 +77,9 @@ class PostService {
             {
                 populate: [
                     {path:"userId", select:"fullName firstName lastName"}, // any virtuals must put their original fields in select
-                    {path:"reaction.userId", select:"fullName firstName lastName"}
-                ]
+                    {path:"reaction.userId", select:"fullName firstName lastName"},
+                    {path:"comments", match:{parentIds:[]}}, // only top-level comments},
+                    ]
             });  
 
         if(!post) throw new NotFoundException("Post not found.");
