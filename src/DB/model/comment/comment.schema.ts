@@ -13,13 +13,10 @@ export const commentSchema = new Schema<IComment>({
         ref:"Post",
         required:true,
     },
-    parentIds:[{
+    parentIds:{
         type:Schema.Types.ObjectId,
         ref:"Comment",
-        required:true,
-    }],
-    content:{
-        type:String,
-    },
+    }, 
+    content:{type:String},
     reactions:[reactionSchema]
 },{timestamps:true});

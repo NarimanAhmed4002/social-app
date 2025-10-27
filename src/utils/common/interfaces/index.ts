@@ -41,7 +41,7 @@ export interface IComment {
     _id:ObjectId;
     userId: ObjectId;
     postId: ObjectId;
-    parentIds: ObjectId[]; // sorted paren1 , parent2, ...
+    parentIds: ObjectId | null; // sorted paren1, parent2, parent3, ...
     content:string;
     attachment?:IAttachment;
     reactions:IReaction[];
