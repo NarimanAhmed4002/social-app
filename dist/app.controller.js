@@ -30,6 +30,7 @@ function bootstrap(app, express) {
             message: error.message,
             success: false,
             errDetails: error.errorDetails,
+            stack: error.stack
         });
     });
 }

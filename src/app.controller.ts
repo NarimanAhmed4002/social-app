@@ -32,6 +32,7 @@ export function bootstrap(app: Express, express: any) {
         message: error.message,
         success: false,
         errDetails: error.errorDetails,
+        stack:error.stack
       });
     }
   );
