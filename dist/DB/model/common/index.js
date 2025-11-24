@@ -14,9 +14,4 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./Connection"), exports);
-__exportStar(require("./model/user/user.repository"), exports);
-__exportStar(require("./model/post/post.repository"), exports);
-__exportStar(require("./model/comment/comment.repository"), exports);
-// Central export file to simplify imports related to database operations.
-// Usually exports everything from the DB folder to simplify imports (e.g., export * from './Connection').
+__exportStar(require("./reaction.schema"), exports);

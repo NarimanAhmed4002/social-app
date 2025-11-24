@@ -13,12 +13,14 @@ function bootstrap(app, express) {
     // user
     app.use("/user", module_1.userRouter);
     // message
-    // comments
     // posts
+    app.use("/post", module_1.postRouter);
+    // comments
+    app.use("/comment", module_1.commentRouter);
     app.use("/{*dummy}", (req, res, next) => {
         return res.status(404).json({
             message: "invalid router",
-            success: false
+            success: false,
         });
     });
     // global error handler
@@ -27,11 +29,10 @@ function bootstrap(app, express) {
         return res.status(error.statusCode || 500).json({
             message: error.message,
             success: false,
-            errDetails: error.errorDetails
+            errDetails: error.errorDetails,
         });
     });
 }
-;
 // Sets up the Express app with middleware, routes, DB connection, and error handling.
 // Central place to configure app components.
 // Initializes routes for different modules (auth, user, etc.).

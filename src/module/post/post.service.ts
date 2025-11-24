@@ -6,90 +6,94 @@ import { NotFoundException, REACTION } from "../../utils";
 import { success } from "zod";
 
 class PostService {
-    private readonly postFactoryService = new PostFactoryService()
-    private readonly postRepository = new PostRepository()
+  private readonly postFactoryService = new PostFactoryService();
+  private readonly postRepository = new PostRepository();
 
+  public create = async (req: Request, res: Response) => {
+    // get data from req
+    const createPostDTO: CreatePostDTO = req.body;
+    // factory >> prepare data post >> post entity >> repository
+    // repository >> post entity >> DB
+    const post = await this.postFactoryService.createPost(
+      createPostDTO,
+      req.user
+    );
+    // save in DB
+    const createdPost = await this.postRepository.create(post);
+    //
+    return res.status(201).json({
+      message: "Post created successfully.",
+      success: true,
+      data: { createdPost },
+    });
+  };
 
-    public create = async (req:Request, res:Response)=>{
-        // get data from req
-        const createPostDTO:CreatePostDTO = req.body;
-        // factory >> prepare data post >> post entity >> repository
-        // repository >> post entity >> DB
-        const post = await this.postFactoryService.createPost(createPostDTO, req.user)
-        // save in DB
-        const createdPost = await this.postRepository.create(post);
-        // 
-        return res.status(201).json({
-            message:"Post created successfully.",
-            success:true,
-            data:{createdPost}
-        })
-    };
+  public addReaction = async (req: Request, res: Response) => {
+    // get data from req
+    const { id } = req.params; // post id
+    const { reaction } = req.body; // user reaction
+    const userId = req.user._id; // user id
+    // check post existence
+    const postExist = await this.postRepository.Exist({ _id: id });
+    if (!postExist) throw new NotFoundException("Post not found.");
 
-    public addReaction = async(req:Request, res:Response)=>{
-        // get data from req
-        const { id } = req.params;  // post id
-        const { reaction } = req.body;  // user reaction
-        const userId = req.user._id;    // user id
-        // check post existence
-        const postExist = await this.postRepository.Exist({_id:id});
-        if(!postExist) throw new NotFoundException("Post not found.");
-        
-        let userReactedIndex = postExist.reactions.findIndex((reaction)=>{
-            return reaction.userId.toString() == userId.toString();
-        })
+    let userReactedIndex = postExist.reactions.findIndex((reaction) => {
+      return reaction.userId.toString() == userId.toString();
+    });
 
-        if(userReactedIndex == -1){
-        await this.postRepository.update(
-            {_id:id},
-            {$push:{
-                reactions:
-                {reaction:
-                    // if (reaction == null | undefined)  {REACTION.like}  else {reaction}
-                    [null, undefined].includes(reaction) ? REACTION.like  : reaction, 
-                    userId }
-                }}
-        );
-        } // if req.body = undefined, null, "" , this means "remove reaction".
-        else if([undefined, null, ""].includes(reaction)){
-            await this.postRepository.update(
-                {_id:id},
-                {$pull:{reactions:postExist.reactions[userReactedIndex]}}
-            )
+    if (userReactedIndex == -1) {
+      await this.postRepository.update(
+        { _id: id },
+        {
+          $push: {
+            reactions: {
+              reaction:
+                // if (reaction == null | undefined)  {REACTION.like}  else {reaction}
+                [null, undefined].includes(reaction) ? REACTION.like : reaction,
+              userId,
+            },
+          },
         }
-         else{
-            await this.postRepository.update(
-                {_id: id, "reactions.userId": userId},
-            {"reactions.$.reaction": reaction}
-            );
-        };
-        
-        // send response
-        return res.status(204)
-
+      );
+    } // if req.body = undefined, null, "" , this means "remove reaction".
+    else if ([undefined, null, ""].includes(reaction)) {
+      await this.postRepository.update(
+        { _id: id },
+        { $pull: { reactions: postExist.reactions[userReactedIndex] } }
+      );
+    } else {
+      await this.postRepository.update(
+        { _id: id, "reactions.userId": userId },
+        { "reactions.$.reaction": reaction }
+      );
     }
 
-    public getSpecificPost = async (req:Request, res:Response)=>{
-        // get data from req
-        const { id } = req.params;  // post id
-        const post = await this.postRepository.getOne({_id:id},
-            {},
-            {
-                populate: [
-                    {path:"userId", select:"fullName firstName lastName"}, // any virtuals must put their original fields in select
-                    {path:"reaction.userId", select:"fullName firstName lastName"},
-                    {path:"comments", match:{parentIds:[]}}, // only top-level comments},
-                    ]
-            });  
+    // send response
+    return res.status(204);
+  };
 
-        if(!post) throw new NotFoundException("Post not found.");
-        return res.status(200).json({
-            message:"Done",
-            success:true,
-            data:{post}
-        })
+  public getSpecificPost = async (req: Request, res: Response) => {
+    // get data from req
+    const { id } = req.params; // post id
+    const post = await this.postRepository.getOne(
+      { _id: id },
+      {},
+      {
+        populate: [
+          { path: "userId", select: "fullName firstName lastName" }, // any virtuals must put their original fields in select
+          { path: "reaction.userId", select: "fullName firstName lastName" },
+          { path: "comments", match: { parentId: null } }, // only top-level comments},
+        ],
+      }
+    );
 
-    }
+    if (!post) throw new NotFoundException("Post not found.");
+    return res.status(200).json({
+      message: "Done",
+      success: true,
+      data: { post },
+    });
+  };
 }
 
 export default new PostService();

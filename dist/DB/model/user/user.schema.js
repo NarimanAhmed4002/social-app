@@ -29,7 +29,7 @@ exports.userSchema = new mongoose_1.Schema({
     password: {
         type: String,
         required: function () {
-            if (this.userAgent == "google")
+            if (this.userAgent == utils_1.USER_AGENT.google)
                 return false;
             return true;
         }
@@ -37,17 +37,17 @@ exports.userSchema = new mongoose_1.Schema({
     credentialsUpdatedAt: { type: Number },
     phone: { type: String },
     role: {
-        type: String,
+        type: Number,
         enum: utils_1.SYS_ROLE,
         default: utils_1.SYS_ROLE.user
     },
     gender: {
-        type: String,
+        type: Number,
         enum: utils_1.GENDER,
         default: utils_1.GENDER.female
     },
     userAgent: {
-        type: String,
+        type: Number,
         enum: utils_1.USER_AGENT,
         default: utils_1.USER_AGENT.local
     },
@@ -64,7 +64,7 @@ exports.userSchema.virtual("fullName").get(function () {
 });
 // Defines the structure of the user document/table, often using Mongoose or an ORM.
 // Example: fields like name, email, password, with validation rules.
-// to JSON to appear in response in postman
+// to JSON to appear in response in postman : to appear virtuals in json response
 // to Object to appear in BE in other functions 
 exports.userSchema.pre("save", async function (next) {
     if (this.userAgent != utils_1.USER_AGENT.google && this.isNew == true)
