@@ -11,6 +11,8 @@ const router = (0, express_1.Router)({ mergeParams: true });
 router.post("{/:id}", (0, auth_middleware_1.isAuthenticated)(), comment_service_1.default.addComment);
 // to get specific comment by id
 router.get("/:id", (0, auth_middleware_1.isAuthenticated)(), comment_service_1.default.getSpecificComment);
+router.delete("/:id", (0, auth_middleware_1.isAuthenticated)(), comment_service_1.default.deleteComment);
+router.patch("/:id", (0, auth_middleware_1.isAuthenticated)(), comment_service_1.default.addReaction);
 exports.default = router;
 // to make params optional in express 5 >> "{/:id}"
 // in previous versions >> "/:id?"

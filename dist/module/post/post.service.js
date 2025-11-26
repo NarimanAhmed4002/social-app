@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const factory_1 = require("./factory");
 const DB_1 = require("../../DB");
 const utils_1 = require("../../utils");
+const factory_1 = require("./factory");
+const react_provider_1 = require("../../utils/common/providers/react.provider");
 class PostService {
     postFactoryService = new factory_1.PostFactoryService();
     postRepository = new DB_1.PostRepository();
@@ -25,32 +26,9 @@ class PostService {
         // get data from req
         const { id } = req.params; // post id
         const { reaction } = req.body; // user reaction
-        const userId = req.user._id; // user id
-        // check post existence
-        const postExist = await this.postRepository.Exist({ _id: id });
-        if (!postExist)
-            throw new utils_1.NotFoundException("Post not found.");
-        let userReactedIndex = postExist.reactions.findIndex((reaction) => {
-            return reaction.userId.toString() == userId.toString();
-        });
-        if (userReactedIndex == -1) {
-            await this.postRepository.update({ _id: id }, {
-                $push: {
-                    reactions: {
-                        reaction: 
-                        // if (reaction == null | undefined)  {REACTION.like}  else {reaction}
-                        [null, undefined].includes(reaction) ? utils_1.REACTION.like : reaction,
-                        userId,
-                    },
-                },
-            });
-        } // if req.body = undefined, null, "" , this means "remove reaction".
-        else if ([undefined, null, ""].includes(reaction)) {
-            await this.postRepository.update({ _id: id }, { $pull: { reactions: postExist.reactions[userReactedIndex] } });
-        }
-        else {
-            await this.postRepository.update({ _id: id, "reactions.userId": userId }, { "reactions.$.reaction": reaction });
-        }
+        const userId = req.user.id; // user id
+        // add reaction using provider
+        await (0, react_provider_1.addReactionProvider)(this.postRepository, id, userId, reaction);
         // send response
         return res.status(204);
     };
@@ -70,6 +48,25 @@ class PostService {
             message: "Done",
             success: true,
             data: { post },
+        });
+    };
+    deletePost = async (req, res) => {
+        // get post id from params
+        const { id } = req.params;
+        // check post existence
+        const postExist = await this.postRepository.Exist({ _id: id });
+        if (!postExist)
+            throw new utils_1.NotFoundException("Post not found.");
+        // check post ownership
+        if (postExist.userId.toString() !== req.user._id.toString()) {
+            throw new utils_1.UnAuthorizedException("You are not authorized to delete this post.");
+        }
+        // delete post
+        await this.postRepository.delete({ _id: id });
+        // send response
+        return res.status(200).json({
+            message: "Post deleted successfully.",
+            success: true,
         });
     };
 }

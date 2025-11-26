@@ -4,6 +4,7 @@ exports.CommentService = void 0;
 const DB_1 = require("../../DB");
 const utils_1 = require("../../utils");
 const factory_1 = require("./factory");
+const react_provider_1 = require("../../utils/common/providers/react.provider");
 class CommentService {
     postRepository = new DB_1.PostRepository();
     commentRepository = new DB_1.CommentRepository();
@@ -49,6 +50,41 @@ class CommentService {
             success: true,
             data: { commentExist },
         });
+    };
+    deleteComment = async (req, res) => {
+        // get comment id from params
+        const { id } = req.params;
+        // check comment existence
+        const commentExist = await this.commentRepository.Exist({ _id: id }, {}, { populate: [{ path: "postId", select: "userId" }] });
+        if (!commentExist)
+            throw new utils_1.NotFoundException("Comment not found.");
+        // check comment ownership
+        if (commentExist.userId.toString() !== req.user._id.toString() &&
+            commentExist.postId.userId.toString() !== req.user._id.toString()) {
+            throw new utils_1.UnAuthorizedException("You are not authorized to delete this comment.");
+        }
+        /**
+         if(![commentExist.userId.toString(), (commentExist.postId as unknown as IPost).userId.toString()].includes(req.user._id.toString())){
+            throw new UnAuthorizedException("You are not authorized to delete this comment.");
+        }
+         */
+        // delete comment
+        await this.commentRepository.delete({ _id: id });
+        // send response
+        return res.status(200).json({
+            message: "Comment deleted successfully.",
+            success: true,
+        });
+    };
+    addReaction = async (req, res) => {
+        // get data from req
+        const { id } = req.params; // comment id
+        const { reaction } = req.body; // user reaction
+        const userId = req.user.id; // user id
+        // add reaction using provider
+        await (0, react_provider_1.addReactionProvider)(this.commentRepository, id, userId, reaction);
+        // send response
+        return res.status(204);
     };
 }
 exports.CommentService = CommentService;

@@ -23,7 +23,7 @@ export class BadRequestException extends AppError {
         super(message, 400, errorDetails)
     }
 }
-export class NotAuthorizedException extends AppError {
+export class UnAuthorizedException extends AppError {
     constructor(message:string, errorDetails?:Record<string, any>[]) {
         super(message, 401, errorDetails)
     }

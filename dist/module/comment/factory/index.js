@@ -13,7 +13,7 @@ class CommentFactoryService {
         //     {newComment.parentIds = comment.parentIds;
         //     newComment.parentIds.push(comment._id);
         // };
-        newComment.parentId = comment._id;
+        newComment.parentId = comment?._id || null;
         newComment.reactions = [];
         return newComment;
     }
