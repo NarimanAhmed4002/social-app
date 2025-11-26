@@ -17,17 +17,18 @@ class UserService {
     };
     updateBasicInfo = async (req, res) => {
         const userId = req.user?._id;
-        const { firstName, lastName, phone, gender } = req.body;
+        const { fullName, phone, gender } = req.body;
         const userExist = await this.userRepository.Exist({ _id: userId });
         if (!userExist)
             throw new utils_1.NotFoundException("User not found");
         const user = this.userFactoryService.updateBasicInfo({
-            firstName,
-            lastName,
+            fullName,
             phone,
             gender,
         });
+        // console.log(user);
         const updateUser = await this.userRepository.update({ _id: userId }, { $set: user });
+        console.log(updateUser);
         return res.status(200).json({
             message: "User basic info updated successfully",
             success: true,

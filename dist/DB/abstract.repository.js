@@ -21,7 +21,7 @@ class AbstractRepository {
         return await this.model.findOne(filter, projection, options);
     }
     async update(filter, update, options) {
-        await this.model.updateOne(filter, update, options);
+        return await this.model.updateOne(filter, update, options);
     }
     async delete(filter) {
         await this.model.deleteOne(filter);

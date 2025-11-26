@@ -30,7 +30,7 @@ export abstract class AbstractRepository <T> {
         update:UpdateQuery<T>, 
         options?:MongooseUpdateQueryOptions
     ) {
-        await this.model.updateOne(filter, update, options)
+        return await this.model.updateOne(filter, update, options);
     }
     
     async delete (
