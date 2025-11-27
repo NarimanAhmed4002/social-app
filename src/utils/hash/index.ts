@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs';
+import { number } from 'zod';
 export const generateHash = (password:string)=>{
     return bcrypt.hashSync(password, 10)
 }
 
-export const compareHash = async (password:string, hashPassword:string)=>{
+export const compareHash = async (password:string , hashPassword:string)=>{
     return await bcrypt.compare(password, hashPassword)
 };
 

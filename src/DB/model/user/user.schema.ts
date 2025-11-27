@@ -1,7 +1,7 @@
 import { Schema} from "mongoose";
 import { IUser } from "../../../utils";
 import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils";
-import { sendEmail } from "../../../utils";
+import { sendMail } from "../../../utils";
 
 export const userSchema = new Schema <IUser> ({
     firstName:{
@@ -51,7 +51,16 @@ export const userSchema = new Schema <IUser> ({
     },
     otp:{type:String},
     otpExpireAt:{type:Date},
-    isVerified:{type:Boolean, default:false}
+    isVerified:{type:Boolean, default:false},
+    // update email
+    otpOldEmail:{type:String},
+    otpNewEmail:{type:String},
+    tempEmail:{type:String},
+    
+    // 2FA
+    is2FAEnabled:{type:Boolean},
+    twoFAOTP:{type:String},
+    twoFAOTPExpireAt:{type:Date}
 
 },{timestamps:true, toJSON:{virtuals:true}, toObject:{virtuals:true}}) // toObject is used to convert the mongoose object to JS Object which is used with findOne, findById, ...etc
 
@@ -69,7 +78,7 @@ userSchema.virtual("fullName").get(function (){
 
 userSchema.pre("save", async function (next) {
     if (this.userAgent != USER_AGENT.google && this.isNew == true)
-    await sendEmail({
+    await sendMail({
         to: this.email, // this refers to the document being saved
         subject:"Confirm your email.",
         html:`<h1>Your OTP is ${this.otp}.</h1>`

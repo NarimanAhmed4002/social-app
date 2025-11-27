@@ -53,7 +53,15 @@ exports.userSchema = new mongoose_1.Schema({
     },
     otp: { type: String },
     otpExpireAt: { type: Date },
-    isVerified: { type: Boolean, default: false }
+    isVerified: { type: Boolean, default: false },
+    // update email
+    otpOldEmail: { type: String },
+    otpNewEmail: { type: String },
+    tempEmail: { type: String },
+    // 2FA
+    is2FAEnabled: { type: Boolean },
+    twoFAOTP: { type: String },
+    twoFAOTPExpireAt: { type: Date }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }); // toObject is used to convert the mongoose object to JS Object which is used with findOne, findById, ...etc
 exports.userSchema.virtual("fullName").get(function () {
     return this.firstName + " " + this.lastName;
@@ -68,7 +76,7 @@ exports.userSchema.virtual("fullName").get(function () {
 // to Object to appear in BE in other functions 
 exports.userSchema.pre("save", async function (next) {
     if (this.userAgent != utils_1.USER_AGENT.google && this.isNew == true)
-        await (0, utils_2.sendEmail)({
+        await (0, utils_2.sendMail)({
             to: this.email, // this refers to the document being saved
             subject: "Confirm your email.",
             html: `<h1>Your OTP is ${this.otp}.</h1>`

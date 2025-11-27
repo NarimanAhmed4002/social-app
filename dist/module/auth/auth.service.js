@@ -36,8 +36,7 @@ class authService {
         const verifyAccountDTO = req.body;
         await auth_provider_1.authProvider.checkOTP(verifyAccountDTO);
         await auth_provider_1.authProvider.updateUser({ email: verifyAccountDTO.email }, { isVerified: true, $unset: { otp: "", otpExpiryeAt: "" } });
-        return res.sendStatus(204); // no content in response >> done
-        // sendStatus not status only to end the response
+        return res.sendStatus(204);
     };
     login = async (req, res) => {
         // get data from req
@@ -53,18 +52,29 @@ class authService {
             throw new utils_1.ForbiddenException("Invalid credintials.");
         }
         ;
-        const accessToken = (0, utils_1.generateToken)({
-            payload: { _id: userExist._id,
-                role: userExist.role
-            },
-            options: { expiresIn: "1d" }
-        });
-        // send response
-        return res.status(200).json({
-            message: "User logged in successfully.",
-            success: true,
-            data: { accessToken }
-        });
+        if (userExist.is2FAEnabled) {
+            if (req.user?.twoFAOTPExpireAt && req.user?.twoFAOTPExpireAt?.getTime() > Date.now()) {
+                throw new utils_1.BadRequestException("OTP is not expired yet!");
+            }
+            const otp = (0, utils_1.generateOTP)();
+            await this.userRepository.update({ email: loginDTO.email }, { $set: {
+                    twoFAOTP: (0, utils_1.generateHash)(otp.toString()),
+                    twoFAOTPExpireAt: new Date(Date.now() + 10 * 60 * 1000)
+                } }); // 10 minutes
+            const accessToken = (0, utils_1.generateToken)({
+                payload: { _id: userExist._id,
+                    role: userExist.role
+                },
+                options: { expiresIn: "1d" }
+            });
+            // send response
+            return res.status(200).json({
+                message: "User logged in successfully.",
+                success: true,
+                data: { accessToken }
+            });
+        }
+        ;
     };
 }
 ;

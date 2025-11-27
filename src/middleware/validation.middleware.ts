@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodType } from "zod";
+import z, { ZodType } from "zod";
 import { BadRequestException } from "../utils";
 
 export const isValid = (schema:ZodType)=>{
@@ -33,3 +33,25 @@ export const isValid = (schema:ZodType)=>{
 
 * They run before controllers to filter or modify requests.
  */
+export const generalFields = z.object({
+    email: z.email(),
+    password: z.string().min(8).max(50),
+    otp: z.string().length(5),
+    phoneNumber: z.string().length(11),
+    name: z.string().min(3).max(50),
+    dob: z.date(),
+    confirmPassword: z.string().min(8).max(50),
+    objectId: z.string().regex(/^[0-9a-fA-F]{24}$/), // أفضل من hex().length(24)
+    headers: z.object({
+        authorization: z.string().min(1, "token is required!"),
+        accept: z.string().optional(),
+        host: z.string().optional(),
+        "accept-encoding": z.string().optional(),
+        "content-type": z.string().optional(),
+        "user-agent": z.string().optional(),
+        "cache-control": z.string().optional(), // صححت spelling
+        "postman-token": z.string().optional(),
+        "content-length": z.string().optional(),
+        connection: z.string().optional(),
+    })
+});

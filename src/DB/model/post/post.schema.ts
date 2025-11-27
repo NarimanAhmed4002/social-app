@@ -18,6 +18,7 @@ export const postSchema = new Schema<IPost>(
       // },
       trim: true,
     },
+    mentions: [{ type: Schema.Types.ObjectId, ref: "User" }],
     reactions: [reactionSchema],
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }

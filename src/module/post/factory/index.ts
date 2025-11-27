@@ -9,6 +9,7 @@ export class PostFactoryService {
     newPost.userId = user._id;
     newPost.reactions = [];
     newPost.attachments = [];
+  
 
     return newPost;
   }

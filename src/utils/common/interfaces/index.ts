@@ -27,6 +27,16 @@ export interface IUser {
   otp?: string;
   otpExpireAt: Date;
   isVerified: boolean;
+
+  // update email
+  otpOldEmail?: string;
+  otpNewEmail?: string;
+  tempEmail?: string;
+  otpExpiry?: Date;
+  // 2FA
+  is2FAEnabled?: boolean;
+  twoFAOTP?: string;
+  twoFAOTPExpireAt?: Date;
 }
 
 export interface IPost {
@@ -34,6 +44,7 @@ export interface IPost {
   userId: ObjectId;
   content: string;
   reactions: IReaction[];
+  mentions?: ObjectId[];
   // attachments?:IAttachment
 }
 

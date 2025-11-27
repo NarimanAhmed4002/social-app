@@ -9,4 +9,8 @@ const auth_middleware_1 = require("../../middleware/auth.middleware");
 const router = (0, express_1.Router)();
 router.get("/:id", (0, auth_middleware_1.isAuthenticated)(), user_service_1.default.getProfile);
 router.put("/basic-info", (0, auth_middleware_1.isAuthenticated)(), user_service_1.default.updateBasicInfo);
+router.post("/update-email", (0, auth_middleware_1.isAuthenticated)(), user_service_1.default.updateEmail);
+router.patch("/replace-email", (0, auth_middleware_1.isAuthenticated)(), user_service_1.default.replaceEmail);
+router.post("/enable-2fa", (0, auth_middleware_1.isAuthenticated)(), user_service_1.default.enable2FA);
+router.post("/verify-2fa", (0, auth_middleware_1.isAuthenticated)(), user_service_1.default.verify2FA);
 exports.default = router;

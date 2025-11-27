@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { LoginDTO, RegisterDTO, VerifyAccountDTO } from "./auth.dto";
-import { compareHash, ConflictException, ForbiddenException, generateToken} from "../../utils";
+import { BadRequestException, compareHash, ConflictException, ForbiddenException, generateHash, generateOTP, generateToken} from "../../utils";
 import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
 import { authProvider } from "./Provider/auth.provider";
@@ -43,8 +43,7 @@ class authService {
             {email:verifyAccountDTO.email},
             {isVerified:true, $unset:{otp:"", otpExpiryeAt:""}}
         );
-        return res.sendStatus(204); // no content in response >> done
-        // sendStatus not status only to end the response
+        return res.sendStatus(204); 
     }
 
     login = async (req:Request, res:Response)=>{
@@ -58,6 +57,17 @@ class authService {
         if(!await compareHash(loginDTO.password, userExist.password)){
             throw new ForbiddenException("Invalid credintials.");
         };
+
+        if(userExist.is2FAEnabled){
+                if( req.user?.twoFAOTPExpireAt && (req.user?.twoFAOTPExpireAt?.getTime() as number) > Date.now()){
+                  throw new BadRequestException("OTP is not expired yet!")}
+            
+            const otp = generateOTP();
+            await this.userRepository.update(
+                {email:loginDTO.email},
+                {$set:{
+                    twoFAOTP: generateHash(otp.toString()), 
+                    twoFAOTPExpireAt:new Date(Date.now()+10*60*1000)}} )// 10 minutes
 
         const accessToken = generateToken({
             payload:{_id:userExist._id, 
@@ -73,7 +83,7 @@ class authService {
         });
     };
 };
-
+};
 export default new authService();
 
 // Contains business logic — e.g., verifying passwords, creating JWT tokens.
