@@ -4,7 +4,7 @@ exports.addReactionProvider = void 0;
 const error_1 = require("../../error");
 const addReactionProvider = async (repo, id, userId, reaction) => {
     // check post existence
-    const postExist = await repo.Exist({ _id: id });
+    const postExist = await repo.Exist({ _id: id, isFrozen: false });
     if (!postExist)
         throw new error_1.NotFoundException("Post not found.");
     let userReactedIndex = postExist.reactions.findIndex((reaction) => {

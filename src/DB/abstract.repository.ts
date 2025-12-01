@@ -33,6 +33,11 @@ export abstract class AbstractRepository <T> {
         return await this.model.updateOne(filter, update, options);
     }
     
+    async deleteM (
+        filter:RootFilterQuery<T>) {
+        const result = await this.model.deleteMany(filter)
+        return result.deletedCount;
+    }
     async delete (
         filter:RootFilterQuery<T>) {
         await this.model.deleteOne(filter)

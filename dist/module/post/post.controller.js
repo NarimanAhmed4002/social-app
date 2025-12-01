@@ -14,4 +14,6 @@ router.post("/", (0, auth_middleware_1.isAuthenticated)(), post_service_1.defaul
 router.patch("/:id", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.addReaction);
 router.get("/:id", post_service_1.default.getSpecificPost); // public API: anyone can get a specific post by id : login not required
 router.delete("/:id", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.deletePost);
+router.patch("/:postId/freeze", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.freezePost);
+router.patch("/:postId/unfreeze", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.unfreezePost);
 exports.default = router;

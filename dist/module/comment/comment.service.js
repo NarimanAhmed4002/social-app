@@ -86,6 +86,38 @@ class CommentService {
         // send response
         return res.status(204);
     };
+    freezeComment = async (req, res) => {
+        const { commentId } = req.params;
+        const user = req.user;
+        const commentExist = await this.commentRepository.Exist({ _id: commentId, isFrozen: false });
+        if (!commentExist)
+            throw new utils_1.NotFoundException("Comment not found or already frozen.");
+        if (user._id.toString() !== commentExist.userId.toString()) {
+            throw new utils_1.UnAuthorizedException("You are not authorized to freeze this comment.");
+        }
+        ;
+        await this.commentRepository.update({ _id: commentId }, { $set: { isFrozen: true } });
+        return res.status(200).json({
+            message: "Comment frozen successfully.",
+            success: true,
+        });
+    };
+    unfreezeComment = async (req, res) => {
+        const { commentId } = req.params;
+        const user = req.user;
+        const commentExist = await this.commentRepository.Exist({ _id: commentId, isFrozen: true });
+        if (!commentExist)
+            throw new utils_1.NotFoundException("Comment not found or not even frozen.");
+        if (user._id.toString() !== commentExist.userId.toString()) {
+            throw new utils_1.UnAuthorizedException("You are not authorized to unfreeze this comment.");
+        }
+        ;
+        await this.commentRepository.update({ _id: commentId }, { $set: { isFrozen: false } });
+        return res.status(200).json({
+            message: "Comment unfrozen successfully.",
+            success: true,
+        });
+    };
 }
 exports.CommentService = CommentService;
 exports.default = new CommentService();

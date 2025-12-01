@@ -22,7 +22,7 @@
     // "declarationMap": true,
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,  
+    //"exactOptionalPropertyTypes": true,  
     //"strictNullChecks": true,
     // Style Options
     // "noImplicitReturns": true,

@@ -8,7 +8,7 @@ export const addReactionProvider = async (
   reaction: string
 ) => {
   // check post existence
-  const postExist = await repo.Exist({ _id: id });
+  const postExist = await repo.Exist({ _id: id , isFrozen:false});
   if (!postExist) throw new NotFoundException("Post not found.");
 
   let userReactedIndex = postExist.reactions.findIndex((reaction) => {

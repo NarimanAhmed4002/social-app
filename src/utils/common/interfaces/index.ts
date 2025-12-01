@@ -1,4 +1,4 @@
-import { GENDER, REACTION, SYS_ROLE, USER_AGENT } from "../../../utils";
+import { FREINDREQUESTSTATUS, GENDER, REACTION, SYS_ROLE, USER_AGENT } from "../../../utils";
 import { Document, ObjectId } from "mongoose";
 
 export interface IAttachment {
@@ -33,10 +33,15 @@ export interface IUser {
   otpNewEmail?: string;
   tempEmail?: string;
   otpExpiry?: Date;
+
   // 2FA
   is2FAEnabled?: boolean;
   twoFAOTP?: string;
   twoFAOTPExpireAt?: Date;
+
+  // Friend Request
+  friends?: ObjectId[];
+  blockedUsers?: ObjectId[];
 }
 
 export interface IPost {
@@ -45,6 +50,8 @@ export interface IPost {
   content: string;
   reactions: IReaction[];
   mentions?: ObjectId[];
+  isFrozen?: boolean;
+  isDeleted?:boolean;
   // attachments?:IAttachment
 }
 
@@ -57,6 +64,8 @@ export interface IComment {
   attachment?: IAttachment;
   reactions: IReaction[];
   mentions: ObjectId[];
+  isFrozen?: boolean;
+  isDeleted?: boolean;
 }
 
 // Re-open interfaces
@@ -70,4 +79,13 @@ declare module "express" {
   interface Request {
     user: IUser & Document;
   }
+}
+
+
+export interface IFriendRequest {
+  from:ObjectId;
+  to:ObjectId;
+  status:FREINDREQUESTSTATUS;
+  createdAt:Date;
+  updatedAt:Date;
 }

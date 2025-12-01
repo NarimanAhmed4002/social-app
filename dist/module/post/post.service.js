@@ -69,5 +69,37 @@ class PostService {
             success: true,
         });
     };
+    freezePost = async (req, res) => {
+        const { postId } = req.params;
+        const user = req.user;
+        const postExist = await this.postRepository.Exist({ _id: postId, isFrozen: false });
+        if (!postExist)
+            throw new utils_1.NotFoundException("Post not found.");
+        if (postExist.userId.toString() !== user._id.toString()) {
+            throw new utils_1.UnAuthorizedException("You are not authorized to freeze this post.");
+        }
+        ;
+        await this.postRepository.update({ _id: postId }, { $set: { isFrozen: true } });
+        return res.status(200).json({
+            message: "Post frozen successfully.",
+            success: true,
+        });
+    };
+    unfreezePost = async (req, res) => {
+        const { postId } = req.params;
+        const user = req.user;
+        const postExist = await this.postRepository.Exist({ _id: postId, isFrozen: true });
+        if (!postExist)
+            throw new utils_1.NotFoundException("Post not found or not even frozen.");
+        if (postExist.userId.toString() !== user._id.toString()) {
+            throw new utils_1.UnAuthorizedException("You are not authorized to unfreeze this post.");
+        }
+        ;
+        await this.postRepository.update({ _id: postId }, { $set: { isFrozen: false } });
+        return res.status(200).json({
+            message: "Post unfrozen successfully.",
+            success: true,
+        });
+    };
 }
 exports.default = new PostService();

@@ -10,5 +10,10 @@ router.post("/", isAuthenticated(), PostService.create)
 router.patch("/:id", isAuthenticated(), PostService.addReaction)
 router.get("/:id", PostService.getSpecificPost) // public API: anyone can get a specific post by id : login not required
 router.delete("/:id", isAuthenticated(), PostService.deletePost)
+router.patch("/:postId/freeze", isAuthenticated(), PostService.freezePost);
+router.patch("/:postId/unfreeze", isAuthenticated(), PostService.unfreezePost);
+router.patch("/:postId/update", isAuthenticated(), PostService.updatePost);
+router.delete("/:id/hard-delete", isAuthenticated(), PostService.hardDeletePost)
+
 export default router;
 

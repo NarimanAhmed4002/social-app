@@ -20,6 +20,20 @@ export const commentSchema = new Schema<IComment>(
     },
     content: { type: String },
     reactions: [reactionSchema],
+    isFrozen:{
+      type:Boolean,
+      default:false,
+    },
+    mentions: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    isDeleted:{
+      type:Boolean,
+      default:false,
+    }
   },
   { timestamps: true }
 );
