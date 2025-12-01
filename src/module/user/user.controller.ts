@@ -22,5 +22,6 @@ router.delete(
 );
 
 router.patch("/unfriend", isAuthenticated(), userService.unfriend);
+router.patch("/block", isAuthenticated(), userService.blockUser);
 
 export default router;
